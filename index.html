@@ -1,0 +1,730 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Beer Pong Şampiyonası</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Patrick+Hand+SC&display=swap" rel="stylesheet">
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="config.js"></script>
+<style>
+  :root{
+    --board:#2e403f; --frame:#161a1a;
+    --chalk:#f3f1e8; --chalk-dim:rgba(243,241,232,.55);
+    --red:#ff7b7b; --blue:#72b6ff; --white:#fffdf5;
+    --gold:#ffe07a; --ok:#9be59b; --danger:#ff8f86;
+    --font:'Patrick Hand','Segoe UI',system-ui,sans-serif;
+    --font-sc:'Patrick Hand SC','Patrick Hand','Segoe UI',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:#0e1111;color:var(--chalk);font-family:var(--font);font-size:19px;line-height:1.25}
+  button,input,select{font-family:inherit}
+
+  /* Çerçeve + tahta */
+  .frame{max-width:1500px;margin:14px auto;padding:14px;background:var(--frame);border-radius:8px;box-shadow:0 10px 40px #0009}
+  .board{background:radial-gradient(1200px 600px at 30% 0%,#37504f 0%,var(--board) 55%,#293a39 100%);padding:26px 28px 32px;border-radius:3px}
+
+  /* Başlık */
+  .top{text-align:center;margin-bottom:22px}
+  h1{font-family:var(--font-sc);font-weight:400;font-size:clamp(30px,6vw,58px);letter-spacing:.06em;margin:0;display:inline-block;padding:0 10px 8px;position:relative;text-shadow:0 0 1px rgba(255,255,255,.4)}
+  h1::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--chalk);filter:url(#rough);opacity:.9}
+  .conn{margin-top:10px;font-size:16px;color:var(--chalk-dim)}
+  .conn.supabase{color:var(--ok)}
+  .conn.local{color:var(--gold)}
+
+  h2{font-family:var(--font-sc);font-weight:400;font-size:26px;letter-spacing:.05em;margin:0 0 10px}
+  h2 small{font-family:var(--font);font-size:20px;color:var(--chalk-dim);letter-spacing:0}
+
+  .panel{border:2px solid var(--chalk-dim);border-radius:14px 10px 16px 9px/10px 15px 9px 14px;padding:16px 18px;background:rgba(0,0,0,.08)}
+  .layout{display:grid;grid-template-columns:340px minmax(0,1fr);gap:22px;align-items:start}
+  #tablesSection{margin-bottom:22px}
+
+  /* Form */
+  .form{display:grid;grid-template-columns:1fr 92px;gap:10px;align-items:end}
+  .form .btn{grid-column:1/-1}
+  label{display:grid;gap:4px;font-size:16px;color:var(--chalk-dim)}
+  input,select{font-size:20px;color:var(--chalk);background:rgba(0,0,0,.24);border:2px solid var(--chalk-dim);border-radius:10px;padding:8px 10px;width:100%;min-height:44px}
+  input:focus,select:focus{outline:none;border-color:var(--gold)}
+  input:disabled{opacity:.45}
+  select option{color:#111}
+  .msg{min-height:22px;margin:8px 0 0;font-size:17px;color:var(--danger)}
+  .note{margin:6px 0 0;font-size:16px;color:var(--chalk-dim)}
+
+  /* Butonlar */
+  .btn{font-size:20px;cursor:pointer;color:var(--chalk);background:transparent;border:2px solid var(--chalk);border-radius:12px 8px 13px 9px/9px 13px 8px 12px;padding:8px 16px;min-height:44px}
+  .btn:hover{background:rgba(255,255,255,.1)}
+  .btn.primary{background:var(--chalk);color:#243231}
+  .btn.primary:hover{background:#fff}
+  .btn.danger{border-color:var(--danger);color:var(--danger)}
+  .btn.danger.solid{background:var(--danger);color:#2b1111}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .btn:focus-visible,.side:focus-visible,.trash:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+  /* Takım listesi */
+  .teams{list-style:none;margin:14px 0 0;padding:0;max-height:540px;overflow:auto}
+  .teams li{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:4px 0 4px 2px;border-bottom:2px dotted rgba(243,241,232,.25)}
+  .teams li.empty{display:block;color:var(--chalk-dim);border:0;padding:8px 0}
+  .teams li.out .tn{opacity:.5;text-decoration:line-through}
+  .tn{overflow-wrap:anywhere}
+  .chip{display:inline-block;margin-left:8px;padding:0 8px;border:1.5px solid var(--chalk-dim);border-radius:999px;font-size:13px;color:var(--chalk-dim);vertical-align:middle;white-space:nowrap}
+  .chip.play{border-color:var(--gold);color:var(--gold)}
+  .chip.adv{border-color:var(--ok);color:var(--ok)}
+  .chip.champ{border-color:var(--gold);color:#2b2300;background:var(--gold)}
+  .lvl{display:inline-grid;place-items:center;min-width:28px;height:28px;padding:0 4px;border:2px solid var(--chalk);border-radius:50%;font-size:16px;flex:none}
+  .lvl.sm{min-width:22px;height:22px;font-size:13px;border-width:1.5px}
+  .trash{background:none;border:0;color:var(--chalk-dim);cursor:pointer;padding:10px;border-radius:10px;display:grid;place-items:center}
+  .trash:hover{color:var(--danger);background:rgba(255,143,134,.14)}
+  .trash svg{width:22px;height:22px}
+
+  #controls{margin-top:16px;display:grid;gap:10px}
+  .hint{margin:0;font-size:16px;color:var(--chalk-dim)}
+
+  /* Masalar */
+  .tables{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .tcard{--tc:var(--chalk);border:3px solid var(--tc);border-radius:16px 11px 17px 12px/12px 17px 11px 16px;padding:12px 14px 14px;background:rgba(0,0,0,.14);min-height:150px}
+  .tcard.kirmizi{--tc:var(--red)} .tcard.mavi{--tc:var(--blue)} .tcard.beyaz{--tc:var(--white)}
+  .thead{font-family:var(--font-sc);font-size:25px;letter-spacing:.06em;color:var(--tc);display:flex;align-items:center;gap:10px}
+  .swatch{width:16px;height:16px;border-radius:50%;background:var(--tc);flex:none}
+  .tmeta{font-size:15px;color:var(--chalk-dim);margin-top:2px}
+  .vs{display:grid;gap:4px;margin-top:8px}
+  .side{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:22px;color:var(--chalk);background:rgba(255,255,255,.07);border:2px solid var(--chalk-dim);border-radius:12px;padding:8px 12px;cursor:pointer;min-height:52px;text-align:left;width:100%}
+  .side:hover{border-color:var(--tc);background:rgba(255,255,255,.14)}
+  .side .nm{overflow-wrap:anywhere}
+  .vsmark{text-align:center;color:var(--chalk-dim);font-size:14px;letter-spacing:.3em}
+  .tempty{margin-top:18px;color:var(--chalk-dim);font-size:20px}
+  .tcard .hint{margin-top:8px;font-size:14px}
+  .queue{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;font-size:17px;color:var(--chalk-dim)}
+  .qchip{border:2px dashed var(--chalk-dim);border-radius:999px;padding:3px 12px;color:var(--chalk)}
+
+  /* Turnuva tablosu */
+  .bracketPanel{min-width:0}
+  .bracket{display:flex;gap:44px;overflow-x:auto;padding:6px 6px 14px;min-height:240px}
+  .col{display:flex;flex-direction:column;min-width:238px;flex:0 0 auto}
+  .colhead{font-family:var(--font-sc);font-size:24px;letter-spacing:.06em;text-align:center}
+  .colsub{font-size:14px;color:var(--chalk-dim);text-align:center;margin-bottom:12px}
+  .colbody{flex:1;display:flex;flex-direction:column;justify-content:space-around;gap:22px}
+  .match{width:220px;margin-right:18px}
+  .mcap{font-size:14px;color:var(--chalk-dim);height:20px;display:flex;align-items:center;gap:6px;white-space:nowrap}
+  .mbody{position:relative;height:80px}
+  .mbody::before{content:"";position:absolute;right:0;top:40px;height:40px;width:2px;background:var(--chalk);filter:url(#roughV);opacity:.85}
+  .mbody::after{content:"";position:absolute;right:-18px;top:59px;width:18px;height:2px;background:var(--chalk);filter:url(#rough);opacity:.85}
+  .slot{position:relative;height:40px;display:flex;align-items:flex-end;justify-content:space-between;gap:8px;padding:0 6px 5px}
+  .slot::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--chalk);filter:url(#rough);opacity:.85}
+  .slot .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:20px;min-width:0}
+  .slot.win .nm{color:var(--gold)}
+  .slot.lose{opacity:.45}
+  .slot.lose .nm,.slot.gone .nm{text-decoration:line-through}
+  .slot.gone{opacity:.5}
+  .slot.empty .nm{color:var(--chalk-dim)}
+  .match.ghost{opacity:.4}
+  .match.playing .mbody{filter:drop-shadow(0 0 5px rgba(255,224,122,.35))}
+  .dot{width:10px;height:10px;border-radius:50%;display:inline-block;background:var(--chalk)}
+  .dot.kirmizi{background:var(--red)} .dot.mavi{background:var(--blue)} .dot.beyaz{background:var(--white)}
+  .champ .colbody{align-items:center;justify-content:center;text-align:center;gap:8px}
+  .trophy{color:var(--gold)} .trophy.ghost{color:var(--chalk-dim);opacity:.5}
+  .trophy svg{width:78px;height:78px}
+  .champname{font-size:28px;color:var(--gold);overflow-wrap:anywhere;max-width:230px}
+  .scrollhint{display:none;margin:-4px 0 6px;font-size:15px;color:var(--chalk-dim)}
+  .empty.big{margin:30px 10px;color:var(--chalk-dim);font-size:22px;text-align:center}
+
+  /* Onay penceresi */
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.62);display:grid;place-items:center;padding:16px;z-index:50}
+  .dlg{background:#2e403f;border:3px solid var(--chalk);border-radius:14px;padding:22px;max-width:440px;width:100%;box-shadow:0 20px 60px #000a}
+  .dlg h3{margin:0 0 8px;font-family:var(--font-sc);font-weight:400;font-size:28px;letter-spacing:.04em}
+  .dlg p{margin:0 0 18px;overflow-wrap:anywhere}
+  .actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#202a2a;border:2px solid var(--chalk);border-radius:12px;padding:10px 16px;z-index:60;max-width:92vw}
+  .toast.err{border-color:var(--danger);color:var(--danger)}
+
+  /* Sadece izleme modu (?view=1) */
+  .view .admin,.view #teamForm,.view #controls,.view #formNote{display:none!important}
+  .view .layout{grid-template-columns:minmax(0,1fr)}
+  .view .side{pointer-events:none}
+
+  @media (max-width:900px){
+    .board{padding:18px 14px 24px}
+    .layout{grid-template-columns:minmax(0,1fr)}
+    .tables{grid-template-columns:1fr}
+    .scrollhint{display:block}
+    .frame{margin:0;padding:8px;border-radius:0}
+  }
+</style>
+</head>
+<body>
+<!-- Tebeşir efekti için hafif bozulma filtreleri -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <filter id="rough" x="-5%" y="-600%" width="110%" height="1300%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9 0.06" numOctaves="2" seed="3" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="roughV" x="-600%" y="-5%" width="1300%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.06 0.9" numOctaves="2" seed="5" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+</svg>
+
+<div class="frame"><div class="board">
+
+  <header class="top">
+    <h1>BEER PONG ŞAMPİYONASI</h1>
+    <div id="conn" class="conn"></div>
+  </header>
+
+  <section id="tablesSection" class="panel" hidden>
+    <h2>Masalar</h2>
+    <div id="tablesBox" class="tables"></div>
+    <div id="queueBox" class="queue"></div>
+  </section>
+
+  <div class="layout">
+    <aside class="panel">
+      <h2>Takımlar <small id="teamCount"></small></h2>
+      <form id="teamForm" class="form" autocomplete="off">
+        <label>Takım adı
+          <input id="nameInput" type="text" maxlength="40" required placeholder="örn. Kırmızı Kuğular">
+        </label>
+        <label>Zorluk
+          <input id="lvlInput" type="number" min="1" max="10" step="1" inputmode="numeric" required placeholder="1-10">
+        </label>
+        <button class="btn primary" type="submit">Takımı ekle</button>
+      </form>
+      <p id="formMsg" class="msg" role="alert"></p>
+      <p id="formNote" class="note"></p>
+      <ul id="teamList" class="teams"></ul>
+      <div id="controls"></div>
+    </aside>
+
+    <section class="panel bracketPanel">
+      <h2>Turnuva tablosu</h2>
+      <p class="scrollhint">Diğer turlar için tabloyu yana kaydır →</p>
+      <div id="board" class="bracket"></div>
+    </section>
+  </div>
+
+</div></div>
+
+<div id="modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="dlgTitle">
+  <div class="dlg">
+    <h3 id="dlgTitle"></h3>
+    <p id="dlgText"></p>
+    <div class="actions">
+      <button type="button" id="dlgCancel" class="btn">Vazgeç</button>
+      <button type="button" id="dlgOk" class="btn primary"></button>
+    </div>
+  </div>
+</div>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+(function(){
+'use strict';
+
+/* ================= Ayarlar ================= */
+const TABLES = [
+  {key:'kirmizi', label:'Kırmızı Masa'},
+  {key:'mavi',    label:'Mavi Masa'},
+  {key:'beyaz',   label:'Beyaz Masa'}
+];
+const DIFF_ROUNDS = 2;   // 1. ve 2. tur zorluğa göre, sonrası rastgele
+const MODE_LABEL = {close:'Benzer seviyeler eşleşsin', balanced:'Güçlü ↔ zayıf eşleşsin'};
+const VIEW = new URLSearchParams(location.search).has('view');
+if (VIEW) document.body.classList.add('view');
+
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => (window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID()
+  : 'id-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+const clone = o => JSON.parse(JSON.stringify(o));
+const blankState = () => ({teams:[], matches:[], t:{status:'setup', current_round:0, pair_mode:'close', champion:null}});
+
+/* ================= Saf mantık (eşleştirme) ================= */
+function shuffle(a){
+  const r = a.slice();
+  for (let i = r.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [r[i], r[j]] = [r[j], r[i]];
+  }
+  return r;
+}
+
+// pool: bu tura giren (silinmemiş) takımlar. Tek sayıysa rastgele biri "bay" geçer.
+function buildRound(pool, round, mode){
+  const list = shuffle(pool);                       // önce karıştır: bay seçimi + eşit seviyelerde rastgelelik
+  const bye = list.length % 2 === 1 ? list.pop() : null;
+  let ordered = list;
+  if (round <= DIFF_ROUNDS) {
+    list.sort((a, b) => a.difficulty - b.difficulty);   // kararlı sıralama
+    if (mode === 'balanced') {
+      ordered = [];
+      for (let i = 0; i < list.length / 2; i++) ordered.push(list[i], list[list.length - 1 - i]);
+    }
+  }
+  const rows = [];
+  for (let i = 0; i < ordered.length; i += 2) {
+    rows.push({round, slot: i / 2, team_a: ordered[i].id, team_b: ordered[i + 1].id,
+      winner: null, status: 'waiting', table_name: null, is_bye: false, walkover: false});
+  }
+  if (bye) rows.push({round, slot: rows.length, team_a: bye.id, team_b: null,
+    winner: bye.id, status: 'done', table_name: null, is_bye: true, walkover: false});
+  return rows;
+}
+function countRounds(n){ let r = 0; while (n > 1) { n = Math.ceil(n / 2); r++; } return r; }
+function pairLabel(round, mode){
+  if (round > DIFF_ROUNDS) return 'rastgele eşleşme';
+  return mode === 'balanced' ? 'güçlü ↔ zayıf' : 'seviyeye göre';
+}
+function roundName(i, total){
+  if (i === total) return 'FİNAL';
+  if (i === total - 1) return 'YARI FİNAL';
+  return i + '. TUR';
+}
+
+/* ================= Veri katmanı ================= */
+const MATCH_DEFAULTS = {team_a:null, team_b:null, winner:null, status:'waiting', table_name:null, is_bye:false, walkover:false};
+
+function createLocalDb(){
+  const KEY = 'beerpong-demo-v1';
+  const read = () => { try { return JSON.parse(localStorage.getItem(KEY)) || blankState(); } catch(e){ return blankState(); } };
+  const write = d => localStorage.setItem(KEY, JSON.stringify(d));
+  return {
+    mode: 'local',
+    async load(){ return read(); },
+    async addTeam(name, difficulty){
+      const d = read(); const t = {id:uid(), name, difficulty, is_deleted:false, created_at:new Date().toISOString()};
+      d.teams.push(t); write(d); return t;
+    },
+    async deleteTeam(id){ const d = read(); d.teams = d.teams.filter(t => t.id !== id); write(d); },
+    async updateTeam(id, p){ const d = read(); Object.assign(d.teams.find(t => t.id === id) || {}, p); write(d); },
+    async insertMatches(list){
+      const d = read(); const rows = list.map(m => Object.assign({id:uid()}, MATCH_DEFAULTS, m));
+      d.matches.push(...rows); write(d); return rows;
+    },
+    async updateMatch(id, p){ const d = read(); Object.assign(d.matches.find(m => m.id === id) || {}, p); write(d); },
+    async updateTournament(p){ const d = read(); Object.assign(d.t, p); write(d); },
+    async reset(){
+      const d = read();
+      d.t = Object.assign(d.t, {status:'setup', current_round:0, champion:null});
+      d.matches = []; d.teams = d.teams.filter(t => !t.is_deleted); write(d);
+    },
+    subscribe(cb){ window.addEventListener('storage', e => { if (e.key === KEY) cb(); }); }
+  };
+}
+
+function createSupabaseDb(url, key){
+  const sb = window.supabase.createClient(url, key);
+  const chk = r => { if (r.error) throw new Error(r.error.message); return r.data; };
+  return {
+    mode: 'supabase',
+    async load(){
+      const [teams, matches, t] = await Promise.all([
+        sb.from('teams').select('*').order('created_at'),
+        sb.from('matches').select('*').order('round').order('slot'),
+        sb.from('tournament').select('*').eq('id', 1).maybeSingle()
+      ]);
+      let trn = chk(t);
+      if (!trn) trn = chk(await sb.from('tournament').upsert({id:1}).select().single());
+      return {teams: chk(teams), matches: chk(matches), t: trn};
+    },
+    async addTeam(name, difficulty){ return chk(await sb.from('teams').insert({name, difficulty}).select().single()); },
+    async deleteTeam(id){ chk(await sb.from('teams').delete().eq('id', id)); },
+    async updateTeam(id, p){ chk(await sb.from('teams').update(p).eq('id', id)); },
+    async insertMatches(list){ return chk(await sb.from('matches').insert(list).select()); },
+    async updateMatch(id, p){ chk(await sb.from('matches').update(p).eq('id', id)); },
+    async updateTournament(p){ chk(await sb.from('tournament').update(Object.assign({updated_at:new Date().toISOString()}, p)).eq('id', 1)); },
+    async reset(){
+      chk(await sb.from('tournament').update({status:'setup', current_round:0, champion:null}).eq('id', 1));
+      chk(await sb.from('matches').delete().not('id', 'is', null));
+      chk(await sb.from('teams').delete().eq('is_deleted', true));
+    },
+    subscribe(cb){ sb.channel('bp-live').on('postgres_changes', {event:'*', schema:'public'}, cb).subscribe(); }
+  };
+}
+
+/* ================= Durum ================= */
+let db, S = blankState(), busy = 0, dirty = false, reloadTimer = null;
+const T = id => S.teams.find(x => x.id === id) || null;
+const aliveTeams = () => S.teams.filter(t => !t.is_deleted);
+const tableLabel = k => (TABLES.find(t => t.key === k) || {}).label || '';
+
+async function patchMatch(id, p){ await db.updateMatch(id, p); const m = S.matches.find(x => x.id === id); if (m) Object.assign(m, p); }
+async function patchTeam(id, p){ await db.updateTeam(id, p); const t = T(id); if (t) Object.assign(t, p); }
+async function patchT(p){ await db.updateTournament(p); Object.assign(S.t, p); }
+
+async function act(fn){
+  busy++;
+  try { await fn(); }
+  catch (e) {
+    console.error(e); toast(e.message || String(e), true);
+    try { S = await db.load(); } catch (_) {}
+  }
+  finally {
+    busy--;
+    if (!busy) { render(); if (dirty) { dirty = false; scheduleReload(); } }
+  }
+}
+function scheduleReload(){
+  clearTimeout(reloadTimer);
+  reloadTimer = setTimeout(async () => {
+    if (busy) { dirty = true; return; }
+    try { S = await db.load(); render(); } catch (e) { console.error(e); }
+  }, 250);
+}
+
+/* ================= Turnuva akışı ================= */
+async function progress(){
+  if (S.t.status !== 'running') return;
+  for (let guard = 0; guard < 25; guard++) {
+    const cur = () => S.matches.filter(m => m.round === S.t.current_round);
+
+    // 1) Silinen takımın maçı: rakip hükmen kazanır
+    for (const m of cur()) {
+      if (m.status === 'done') continue;
+      const a = T(m.team_a), b = T(m.team_b);
+      if ((a && a.is_deleted) || (b && b.is_deleted)) {
+        const w = (a && !a.is_deleted) ? a.id : ((b && !b.is_deleted) ? b.id : null);
+        await patchMatch(m.id, {status:'done', winner:w, walkover:true, table_name:null});
+      }
+    }
+
+    // 2) Tur bitti mi? → şampiyon ya da sonraki tur
+    const matches = cur();
+    if (matches.length && matches.every(m => m.status === 'done')) {
+      const pool = matches.map(m => m.winner).filter(Boolean).map(T).filter(t => t && !t.is_deleted);
+      if (pool.length <= 1) {
+        await patchT({status:'finished', champion: pool[0] ? pool[0].id : null});
+        return;
+      }
+      const next = S.t.current_round + 1;
+      if (S.matches.some(m => m.round === next)) break;     // başka cihaz zaten oluşturmuş
+      const rows = await db.insertMatches(buildRound(pool, next, S.t.pair_mode));
+      S.matches.push(...rows);
+      await patchT({current_round: next});
+      continue;
+    }
+    break;
+  }
+  await assignTables();
+}
+
+// Boş masalara, sıradaki maçları sırayla yerleştirir
+async function assignTables(){
+  const cur = S.matches.filter(m => m.round === S.t.current_round);
+  const used = new Set(cur.filter(m => m.status === 'playing').map(m => m.table_name));
+  const free = TABLES.map(t => t.key).filter(k => !used.has(k));
+  const waiting = cur.filter(m => m.status === 'waiting').sort((a, b) => a.slot - b.slot);
+  for (let i = 0; i < Math.min(free.length, waiting.length); i++) {
+    await patchMatch(waiting[i].id, {status:'playing', table_name:free[i]});
+  }
+}
+
+/* ================= Eylemler ================= */
+async function onStart(){
+  const pool = aliveTeams();
+  if (pool.length < 2) return;
+  const ok = await confirmDlg({
+    title: 'Turnuva başlasın mı?',
+    text: `${pool.length} takım, ${countRounds(pool.length)} tur. Başladıktan sonra yeni takım eklenemez.`,
+    okText: 'Başlat'
+  });
+  if (!ok) return;
+  await act(async () => {
+    const rows = await db.insertMatches(buildRound(pool, 1, S.t.pair_mode));
+    S.matches.push(...rows);
+    await patchT({status:'running', current_round:1});
+    await progress();
+  });
+}
+
+async function onWinner(mid, tid){
+  const m = S.matches.find(x => x.id === mid), t = T(tid);
+  if (!m || !t || m.status !== 'playing') return;
+  const ok = await confirmDlg({
+    title: 'Kazananı onayla',
+    text: `“${t.name}” kazandı olarak kaydedilsin mi?`,
+    okText: 'Evet, kazandı'
+  });
+  if (!ok) return;
+  await act(async () => {
+    const fresh = S.matches.find(x => x.id === mid);
+    if (!fresh || fresh.status !== 'playing') return;
+    await patchMatch(mid, {status:'done', winner:tid, table_name:null});
+    await progress();
+  });
+}
+
+async function onDelete(id){
+  const t = T(id); if (!t) return;
+  const running = S.t.status === 'running';
+  const ok = await confirmDlg({
+    title: 'Takımı sil',
+    text: `“${t.name}” takımını silmek istediğine emin misin?` +
+      (running ? ' Turnuva devam ediyor: bu takım turnuvadan çıkarılır ve henüz oynamadığı maçta rakibi hükmen kazanır.' : ''),
+    okText: 'Evet, sil', danger: true
+  });
+  if (!ok) return;
+  await act(async () => {
+    if (S.t.status === 'setup') {
+      await db.deleteTeam(id);
+      S.teams = S.teams.filter(x => x.id !== id);
+    } else {
+      await patchTeam(id, {is_deleted:true});
+      await progress();
+    }
+  });
+}
+
+async function onReset(){
+  const ok = await confirmDlg({
+    title: 'Turnuvayı sıfırla',
+    text: 'Tüm maçlar ve sonuçlar silinir. Silinmemiş takımlar listede kalır ve yeniden başlatabilirsin.',
+    okText: 'Evet, sıfırla', danger: true
+  });
+  if (!ok) return;
+  await act(async () => { await db.reset(); S = await db.load(); });
+}
+
+/* ================= Arayüz ================= */
+const ICON_TRASH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>';
+const ICON_CUP = '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 8h24v14a12 12 0 0 1-24 0V8z"/><path d="M20 12H10v4a10 10 0 0 0 10 10"/><path d="M44 12h10v4a10 10 0 0 1-10 10"/><path d="M32 34v10"/><path d="M26 44h12v12H26z"/><path d="M20 56h24"/></svg>';
+
+function teamState(t){
+  if (S.t.status === 'setup') return null;
+  if (S.t.champion === t.id) return {k:'champ', txt:'ŞAMPİYON'};
+  const m = S.matches.filter(x => x.round === S.t.current_round).find(x => x.team_a === t.id || x.team_b === t.id);
+  if (!m) return {k:'out', txt:'Elendi'};
+  if (m.status === 'playing') return {k:'play', txt:'Oynuyor · ' + tableLabel(m.table_name)};
+  if (m.status === 'waiting') return {k:'wait', txt:'Sırada'};
+  if (m.winner === t.id) return {k:'adv', txt: m.is_bye ? 'Bay · üst tura' : 'Üst tura'};
+  return {k:'out', txt:'Elendi'};
+}
+
+function renderConn(){
+  const el = $('#conn');
+  el.className = 'conn ' + db.mode;
+  el.textContent = db.mode === 'supabase'
+    ? '● Canlı — Supabase bağlı'
+    : '● Demo modu — veriler yalnızca bu tarayıcıda (config.js boş)';
+}
+
+function renderTeams(){
+  const list = aliveTeams();
+  $('#teamCount').textContent = list.length ? `(${list.length})` : '';
+  const finished = S.t.status === 'finished';
+  $('#teamList').innerHTML = list.length ? list.map(t => {
+    const st = teamState(t);
+    return `<li class="${st && st.k === 'out' ? 'out' : ''}">
+      <span class="tn">${esc(t.name)}${st ? `<span class="chip ${st.k}">${esc(st.txt)}</span>` : ''}</span>
+      <span class="lvl" title="Zorluk seviyesi">${t.difficulty}</span>
+      ${finished ? '<span></span>' : `<button type="button" class="trash admin" data-del="${t.id}" aria-label="${esc(t.name)} takımını sil" title="Sil">${ICON_TRASH}</button>`}
+    </li>`;
+  }).join('') : '<li class="empty">Henüz takım yok. Yukarıdan ekle.</li>';
+}
+
+function renderControls(){
+  const n = aliveTeams().length;
+  if (S.t.status === 'setup' && !S.matches.length) {
+    $('#controls').innerHTML = `
+      <label>Eşleştirme (1. ve 2. tur)
+        <select id="modeSel">${Object.keys(MODE_LABEL).map(k => `<option value="${k}" ${S.t.pair_mode === k ? 'selected' : ''}>${MODE_LABEL[k]}</option>`).join('')}</select>
+      </label>
+      <button type="button" id="startBtn" class="btn primary" ${n < 2 ? 'disabled' : ''}>Turnuvayı başlat</button>
+      <p class="hint">${n < 2 ? 'Başlamak için en az 2 takım gerekli.' : `${n} takım · ${countRounds(n)} tur · aynı anda en fazla 3 maç`}</p>`;
+  } else {
+    $('#controls').innerHTML = `
+      <p class="hint">Eşleştirme: ${esc(MODE_LABEL[S.t.pair_mode] || '')} (1-2. tur), sonrası rastgele.</p>
+      <button type="button" id="resetBtn" class="btn danger">Turnuvayı sıfırla</button>`;
+  }
+}
+
+function renderTables(){
+  const running = S.t.status === 'running';
+  $('#tablesSection').hidden = !running;
+  if (!running) return;
+  const cur = S.matches.filter(m => m.round === S.t.current_round);
+  $('#tablesBox').innerHTML = TABLES.map(tb => {
+    const m = cur.find(x => x.status === 'playing' && x.table_name === tb.key);
+    let body;
+    if (m) {
+      const a = T(m.team_a), b = T(m.team_b);
+      const side = t => `<button type="button" class="side" data-win="${m.id}:${t.id}"><span class="nm">${esc(t.name)}</span><span class="lvl sm">${t.difficulty}</span></button>`;
+      body = `<div class="tmeta">${m.round}. tur · maç ${m.slot + 1}</div>
+        <div class="vs">${side(a)}<div class="vsmark">VS</div>${side(b)}</div>
+        <p class="hint">Kazanan takıma dokun</p>`;
+    } else {
+      body = '<div class="tempty">Boş masa</div>';
+    }
+    return `<div class="tcard ${tb.key}"><div class="thead"><span class="swatch"></span>${tb.label}</div>${body}</div>`;
+  }).join('');
+
+  const waiting = cur.filter(m => m.status === 'waiting').sort((a, b) => a.slot - b.slot);
+  $('#queueBox').innerHTML = waiting.length
+    ? '<strong>Sırada:</strong>' + waiting.map(m => `<span class="qchip">${esc(T(m.team_a).name)} – ${esc(T(m.team_b).name)}</span>`).join('')
+    : '';
+}
+
+function slotHTML(t, m){
+  if (!t) return '<div class="slot empty"><span class="nm">—</span></div>';
+  const win = m.status === 'done' && m.winner === t.id;
+  const lose = m.status === 'done' && !m.is_bye && m.winner && m.winner !== t.id;
+  return `<div class="slot ${win ? 'win' : ''} ${lose ? 'lose' : ''} ${t.is_deleted ? 'gone' : ''}">
+    <span class="nm" title="${esc(t.name)}">${esc(t.name)}</span><span class="lvl sm">${t.difficulty}</span></div>`;
+}
+
+function matchHTML(m){
+  let cap;
+  if (m.is_bye) cap = 'BAY · otomatik üst tura';
+  else if (m.status === 'playing') cap = `<i class="dot ${m.table_name}"></i>${esc(tableLabel(m.table_name))}`;
+  else if (m.status === 'waiting') cap = 'sırada';
+  else cap = m.walkover ? 'hükmen' : 'bitti';
+  return `<div class="match ${m.status}">
+    <div class="mcap">${cap}</div>
+    <div class="mbody">${slotHTML(T(m.team_a), m)}${slotHTML(T(m.team_b), m)}</div></div>`;
+}
+
+function ghostHTML(isBye){
+  return `<div class="match ghost"><div class="mcap">${isBye ? 'bay' : ''}</div>
+    <div class="mbody"><div class="slot empty"><span class="nm"></span></div><div class="slot empty"><span class="nm">${isBye ? 'BAY' : ''}</span></div></div></div>`;
+}
+
+function renderBoard(){
+  const box = $('#board');
+  const alive = aliveTeams();
+  const byRound = new Map();
+  S.matches.forEach(m => { if (!byRound.has(m.round)) byRound.set(m.round, []); byRound.get(m.round).push(m); });
+  const rounds = [...byRound.keys()].sort((a, b) => a - b);
+
+  if (!rounds.length && alive.length < 2) {
+    box.innerHTML = '<p class="empty big">Eşleşmeleri görmek için en az 2 takım ekle.</p>';
+    return;
+  }
+
+  const cols = [];
+  let next, rno;
+  rounds.forEach(r => cols.push({round:r, matches:byRound.get(r).slice().sort((a, b) => a.slot - b.slot)}));
+  if (rounds.length) { next = cols[cols.length - 1].matches.length; rno = rounds[rounds.length - 1] + 1; }
+  else { next = alive.length; rno = 1; }
+  while (next > 1) {                       // henüz oynanmamış turlar: boş tebeşir çizgileri
+    const c = Math.ceil(next / 2);
+    cols.push({round:rno, ghost:{count:c, bye:next % 2 === 1}});
+    next = c; rno++;
+  }
+  const total = cols.length;
+
+  let html = cols.map((c, i) => {
+    const inner = c.matches
+      ? c.matches.map(matchHTML).join('')
+      : Array.from({length:c.ghost.count}, (_, k) => ghostHTML(c.ghost.bye && k === c.ghost.count - 1)).join('');
+    return `<div class="col"><div class="colhead">${roundName(i + 1, total)}</div>
+      <div class="colsub">${pairLabel(c.round, S.t.pair_mode)}</div><div class="colbody">${inner}</div></div>`;
+  }).join('');
+
+  const champ = S.t.status === 'finished' && S.t.champion ? T(S.t.champion) : null;
+  html += `<div class="col champ"><div class="colhead">ŞAMPİYON</div><div class="colsub">&nbsp;</div>
+    <div class="colbody">${champ
+      ? `<div class="trophy">${ICON_CUP}</div><div class="champname">${esc(champ.name)}</div>`
+      : `<div class="trophy ghost">${ICON_CUP}</div>`}</div></div>`;
+  box.innerHTML = html;
+}
+
+function render(){
+  renderConn(); renderTeams(); renderControls(); renderTables(); renderBoard();
+  const locked = S.t.status !== 'setup' || S.matches.length > 0;
+  $('#teamForm').querySelectorAll('input,button').forEach(el => { el.disabled = locked; });
+  $('#formNote').textContent = locked ? 'Turnuva başladığı için yeni takım eklenemez.' : '';
+}
+
+/* ================= Onay penceresi + bildirim ================= */
+function confirmDlg({title, text, okText = 'Evet', danger = false}){
+  return new Promise(resolve => {
+    const m = $('#modal'), ok = $('#dlgOk'), cancel = $('#dlgCancel');
+    $('#dlgTitle').textContent = title;
+    $('#dlgText').textContent = text;
+    ok.textContent = okText;
+    ok.className = 'btn ' + (danger ? 'danger solid' : 'primary');
+    m.hidden = false;
+    (danger ? cancel : ok).focus();
+    const onKey = e => { if (e.key === 'Escape') done(false); };
+    const done = v => {
+      m.hidden = true; ok.onclick = cancel.onclick = m.onclick = null;
+      document.removeEventListener('keydown', onKey); resolve(v);
+    };
+    ok.onclick = () => done(true);
+    cancel.onclick = () => done(false);
+    m.onclick = e => { if (e.target === m) done(false); };
+    document.addEventListener('keydown', onKey);
+  });
+}
+
+let toastTimer;
+function toast(msg, isErr){
+  const el = $('#toast');
+  el.textContent = msg; el.className = 'toast' + (isErr ? ' err' : ''); el.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; }, isErr ? 6000 : 2500);
+}
+
+/* ================= Olaylar ================= */
+function bind(){
+  $('#teamForm').addEventListener('submit', e => {
+    e.preventDefault();
+    if (VIEW) return;
+    const msg = $('#formMsg'); msg.textContent = '';
+    const name = $('#nameInput').value.replace(/\s+/g, ' ').trim();
+    const lvl = Number($('#lvlInput').value);
+    if (!name) { msg.textContent = 'Takım adı boş olamaz.'; return; }
+    if (!Number.isInteger(lvl) || lvl < 1 || lvl > 10) { msg.textContent = 'Zorluk seviyesi 1 ile 10 arasında bir tam sayı olmalı.'; return; }
+    const key = s => s.toLocaleLowerCase('tr');
+    if (aliveTeams().some(t => key(t.name) === key(name))) { msg.textContent = 'Bu isimde bir takım zaten var.'; return; }
+    act(async () => {
+      const t = await db.addTeam(name, lvl);
+      S.teams.push(t);
+      $('#nameInput').value = ''; $('#lvlInput').value = '';
+      $('#nameInput').focus();
+    });
+  });
+
+  document.addEventListener('click', e => {
+    if (VIEW) return;
+    const del = e.target.closest('[data-del]');
+    if (del) { onDelete(del.dataset.del); return; }
+    const win = e.target.closest('[data-win]');
+    if (win) { const [mid, tid] = win.dataset.win.split(':'); onWinner(mid, tid); return; }
+    if (e.target.closest('#startBtn')) onStart();
+    else if (e.target.closest('#resetBtn')) onReset();
+  });
+
+  document.addEventListener('change', e => {
+    if (VIEW) return;
+    if (e.target.id === 'modeSel') { const v = e.target.value; act(() => patchT({pair_mode:v})); }
+  });
+}
+
+/* ================= Başlangıç ================= */
+async function init(){
+  const cfg = window.APP_CONFIG || {};
+  if (cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY) {
+    if (window.supabase && window.supabase.createClient) db = createSupabaseDb(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+    else { db = createLocalDb(); toast('Supabase kütüphanesi yüklenemedi, demo modundasın.', true); }
+  } else {
+    db = createLocalDb();
+  }
+  bind();
+  try { S = await db.load(); }
+  catch (e) { console.error(e); toast('Veri yüklenemedi: ' + e.message, true); }
+  render();
+  try {
+    db.subscribe(() => { if (busy) { dirty = true; } else scheduleReload(); });
+  } catch (e) { console.error(e); }
+}
+
+window.__BP = {buildRound, countRounds};   // test için
+window.addEventListener('DOMContentLoaded', init);
+})();
+</script>
+</body>
+</html>

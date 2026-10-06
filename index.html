@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Beer Pong Şampiyonası</title>
+<title>🍻 Beer Pong Turnuvası 🍻</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Patrick+Hand+SC&display=swap" rel="stylesheet">
@@ -11,45 +11,53 @@
 <script defer src="config.js"></script>
 <style>
   :root{
-    --board:#2e403f; --frame:#161a1a;
-    --chalk:#f3f1e8; --chalk-dim:rgba(243,241,232,.55);
-    --red:#ff7b7b; --blue:#72b6ff; --white:#fffdf5;
-    --gold:#ffe07a; --ok:#9be59b; --danger:#ff8f86;
+    --chalk:#f6f3ea; --chalk-dim:rgba(246,243,234,.6);
+    --yellow:#ffd84d; --pink:#ff7eb6; --cyan:#5ee0ff; --green:#7dffa6;
+    --orange:#ffa05c; --purple:#b99aff; --danger:#ff7a7a; --ok:#8dffae;
+    --t-red:#ff6464; --t-blue:#58a9ff; --t-white:#ffffff;
     --font:'Patrick Hand','Segoe UI',system-ui,sans-serif;
-    --font-sc:'Patrick Hand SC','Patrick Hand','Segoe UI',system-ui,sans-serif;
   }
   *{box-sizing:border-box}
   [hidden]{display:none!important}
   html{-webkit-text-size-adjust:100%}
-  body{margin:0;background:#0e1111;color:var(--chalk);font-family:var(--font);font-size:19px;line-height:1.25}
+  body{margin:0;background:#0d1112;color:var(--chalk);font-family:var(--font);font-size:19px;line-height:1.25}
   button,input,select{font-family:inherit}
 
   /* Çerçeve + tahta */
-  .frame{max-width:1500px;margin:14px auto;padding:14px;background:var(--frame);border-radius:8px;box-shadow:0 10px 40px #0009}
-  .board{background:radial-gradient(1200px 600px at 30% 0%,#37504f 0%,var(--board) 55%,#293a39 100%);padding:26px 28px 32px;border-radius:3px}
+  .frame{max-width:1500px;margin:14px auto;padding:14px;background:#15181a;border-radius:10px;box-shadow:0 10px 40px #000a, 0 0 0 2px #2a2f33}
+  .board{
+    background:
+      radial-gradient(900px 480px at 12% -10%, rgba(255,126,182,.20), transparent 62%),
+      radial-gradient(900px 480px at 96% 0%, rgba(94,224,255,.18), transparent 62%),
+      radial-gradient(800px 500px at 50% 110%, rgba(255,216,77,.10), transparent 60%),
+      linear-gradient(160deg,#28524b,#20403b 60%,#1b3733);
+    padding:26px 28px 32px;border-radius:4px}
 
   /* Başlık */
-  .top{text-align:center;margin-bottom:22px}
-  h1{font-family:var(--font-sc);font-weight:400;font-size:clamp(30px,6vw,58px);letter-spacing:.06em;margin:0;display:inline-block;padding:0 10px 8px;position:relative;text-shadow:0 0 1px rgba(255,255,255,.4)}
-  h1::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--chalk);filter:url(#rough);opacity:.9}
+  .top{text-align:center;margin-bottom:24px}
+  h1{font-family:var(--font);font-weight:400;font-size:clamp(28px,6.2vw,60px);margin:0;display:inline-flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.3em;padding:0 12px 12px;position:relative;line-height:1.1}
+  h1 .grad{background:linear-gradient(90deg,var(--yellow),var(--pink) 50%,var(--cyan));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;letter-spacing:.03em}
+  h1::after{content:"";position:absolute;left:3%;right:3%;bottom:0;height:4px;border-radius:4px;background:linear-gradient(90deg,var(--yellow),var(--pink),var(--cyan),var(--green));filter:url(#rough)}
   .conn{margin-top:10px;font-size:16px;color:var(--chalk-dim)}
   .conn.supabase{color:var(--ok)}
-  .conn.local{color:var(--gold)}
+  .conn.local{color:var(--yellow)}
 
-  h2{font-family:var(--font-sc);font-weight:400;font-size:26px;letter-spacing:.05em;margin:0 0 10px}
-  h2 small{font-family:var(--font);font-size:20px;color:var(--chalk-dim);letter-spacing:0}
+  h2{font-family:var(--font);font-weight:400;font-size:27px;letter-spacing:.03em;margin:0 0 10px;color:var(--pc)}
+  h2 small{font-size:20px;color:var(--chalk-dim);letter-spacing:0}
 
-  .panel{border:2px solid var(--chalk-dim);border-radius:14px 10px 16px 9px/10px 15px 9px 14px;padding:16px 18px;background:rgba(0,0,0,.08)}
-  .layout{display:grid;grid-template-columns:340px minmax(0,1fr);gap:22px;align-items:start}
+  .panel{--pc:var(--chalk-dim);border:2px solid var(--pc);border-radius:14px 10px 16px 9px/10px 15px 9px 14px;padding:16px 18px;background:rgba(0,0,0,.12)}
+  .p-teams{--pc:var(--pink)} .p-tables{--pc:var(--yellow)} .p-board{--pc:var(--cyan)}
+  .layout{display:grid;grid-template-columns:350px minmax(0,1fr);gap:22px;align-items:start}
   #tablesSection{margin-bottom:22px}
 
   /* Form */
-  .form{display:grid;grid-template-columns:1fr 92px;gap:10px;align-items:end}
+  .form{display:grid;grid-template-columns:1fr 96px;gap:10px;align-items:end}
   .form .btn{grid-column:1/-1}
   label{display:grid;gap:4px;font-size:16px;color:var(--chalk-dim)}
-  input,select{font-size:20px;color:var(--chalk);background:rgba(0,0,0,.24);border:2px solid var(--chalk-dim);border-radius:10px;padding:8px 10px;width:100%;min-height:44px}
-  input:focus,select:focus{outline:none;border-color:var(--gold)}
+  input,select{font-size:20px;color:var(--chalk);background:rgba(0,0,0,.28);border:2px solid rgba(255,126,182,.55);border-radius:10px;padding:8px 10px;width:100%;min-height:44px}
+  input:focus,select:focus{outline:none;border-color:var(--yellow)}
   input:disabled{opacity:.45}
+  select{border-color:rgba(94,224,255,.6)}
   select option{color:#111}
   .msg{min-height:22px;margin:8px 0 0;font-size:17px;color:var(--danger)}
   .note{margin:6px 0 0;font-size:16px;color:var(--chalk-dim)}
@@ -57,27 +65,34 @@
   /* Butonlar */
   .btn{font-size:20px;cursor:pointer;color:var(--chalk);background:transparent;border:2px solid var(--chalk);border-radius:12px 8px 13px 9px/9px 13px 8px 12px;padding:8px 16px;min-height:44px}
   .btn:hover{background:rgba(255,255,255,.1)}
-  .btn.primary{background:var(--chalk);color:#243231}
-  .btn.primary:hover{background:#fff}
+  .btn.primary{background:var(--yellow);border-color:var(--yellow);color:#2b2300}
+  .btn.primary:hover{background:#ffe88a}
+  .btn.alt{border-color:var(--cyan);color:var(--cyan)}
+  .btn.alt:hover{background:rgba(94,224,255,.14)}
+  .btn.pink{border-color:var(--pink);color:var(--pink)}
   .btn.danger{border-color:var(--danger);color:var(--danger)}
   .btn.danger.solid{background:var(--danger);color:#2b1111}
   .btn:disabled{opacity:.4;cursor:not-allowed}
-  .btn:focus-visible,.side:focus-visible,.trash:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .btn:focus-visible,.side:focus-visible,.trash:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+
+  /* Zorluk rozeti: yeşil (kolay) → kırmızı (zor) */
+  .lvl{--hue:calc(135 - (var(--lv) - 1) * 14.5);display:inline-grid;place-items:center;min-width:28px;height:28px;padding:0 6px;border:2px solid hsl(var(--hue) 90% 60%);border-radius:999px;font-size:16px;line-height:1;color:hsl(var(--hue) 100% 80%);background:hsl(var(--hue) 70% 30% / .5);flex:none;white-space:nowrap}
+  .lvl.sm{min-width:26px;height:26px;font-size:15px;padding:0 5px}
+  .lvl.full{padding:0 11px;font-size:15px}
 
   /* Takım listesi */
   .teams{list-style:none;margin:14px 0 0;padding:0;max-height:540px;overflow:auto}
-  .teams li{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:4px 0 4px 2px;border-bottom:2px dotted rgba(243,241,232,.25)}
+  .teams li{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:4px 0 4px 2px;border-bottom:2px dotted rgba(246,243,234,.22)}
   .teams li.empty{display:block;color:var(--chalk-dim);border:0;padding:8px 0}
   .teams li.out .tn{opacity:.5;text-decoration:line-through}
   .tn{overflow-wrap:anywhere}
   .chip{display:inline-block;margin-left:8px;padding:0 8px;border:1.5px solid var(--chalk-dim);border-radius:999px;font-size:13px;color:var(--chalk-dim);vertical-align:middle;white-space:nowrap}
-  .chip.play{border-color:var(--gold);color:var(--gold)}
+  .chip.play{border-color:var(--yellow);color:var(--yellow)}
+  .chip.wait{border-color:var(--cyan);color:var(--cyan)}
   .chip.adv{border-color:var(--ok);color:var(--ok)}
-  .chip.champ{border-color:var(--gold);color:#2b2300;background:var(--gold)}
-  .lvl{display:inline-grid;place-items:center;min-width:28px;height:28px;padding:0 4px;border:2px solid var(--chalk);border-radius:50%;font-size:16px;flex:none}
-  .lvl.sm{min-width:22px;height:22px;font-size:13px;border-width:1.5px}
+  .chip.champ{border-color:var(--yellow);color:#2b2300;background:var(--yellow)}
   .trash{background:none;border:0;color:var(--chalk-dim);cursor:pointer;padding:10px;border-radius:10px;display:grid;place-items:center}
-  .trash:hover{color:var(--danger);background:rgba(255,143,134,.14)}
+  .trash:hover{color:var(--danger);background:rgba(255,122,122,.16)}
   .trash svg{width:22px;height:22px}
 
   #controls{margin-top:16px;display:grid;gap:10px}
@@ -85,63 +100,74 @@
 
   /* Masalar */
   .tables{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-  .tcard{--tc:var(--chalk);border:3px solid var(--tc);border-radius:16px 11px 17px 12px/12px 17px 11px 16px;padding:12px 14px 14px;background:rgba(0,0,0,.14);min-height:150px}
-  .tcard.kirmizi{--tc:var(--red)} .tcard.mavi{--tc:var(--blue)} .tcard.beyaz{--tc:var(--white)}
-  .thead{font-family:var(--font-sc);font-size:25px;letter-spacing:.06em;color:var(--tc);display:flex;align-items:center;gap:10px}
-  .swatch{width:16px;height:16px;border-radius:50%;background:var(--tc);flex:none}
+  .tcard{--tc:var(--chalk);border:3px solid var(--tc);border-radius:16px 11px 17px 12px/12px 17px 11px 16px;padding:12px 14px 14px;background:linear-gradient(180deg,color-mix(in srgb,var(--tc) 14%,transparent),rgba(0,0,0,.14));min-height:150px}
+  .tcard.kirmizi{--tc:var(--t-red)} .tcard.mavi{--tc:var(--t-blue)} .tcard.beyaz{--tc:var(--t-white)}
+  .thead{font-size:27px;letter-spacing:.04em;color:var(--tc);display:flex;align-items:center;gap:10px}
+  .swatch{width:16px;height:16px;border-radius:50%;background:var(--tc);flex:none;box-shadow:0 0 10px var(--tc)}
   .tmeta{font-size:15px;color:var(--chalk-dim);margin-top:2px}
   .vs{display:grid;gap:4px;margin-top:8px}
-  .side{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:22px;color:var(--chalk);background:rgba(255,255,255,.07);border:2px solid var(--chalk-dim);border-radius:12px;padding:8px 12px;cursor:pointer;min-height:52px;text-align:left;width:100%}
-  .side:hover{border-color:var(--tc);background:rgba(255,255,255,.14)}
+  .side{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:22px;color:var(--chalk);background:rgba(255,255,255,.08);border:2px solid var(--chalk-dim);border-radius:12px;padding:8px 12px;cursor:pointer;min-height:52px;text-align:left;width:100%}
+  .side:hover{border-color:var(--tc);background:rgba(255,255,255,.16)}
   .side .nm{overflow-wrap:anywhere}
   .vsmark{text-align:center;color:var(--chalk-dim);font-size:14px;letter-spacing:.3em}
   .tempty{margin-top:18px;color:var(--chalk-dim);font-size:20px}
   .tcard .hint{margin-top:8px;font-size:14px}
   .queue{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;font-size:17px;color:var(--chalk-dim)}
-  .qchip{border:2px dashed var(--chalk-dim);border-radius:999px;padding:3px 12px;color:var(--chalk)}
+  .queue .lab{color:var(--yellow)}
+  .qchip{display:inline-flex;align-items:center;gap:6px;border:2px dashed var(--chalk-dim);border-radius:999px;padding:3px 12px;color:var(--chalk)}
+  .qchip.wait{border-color:var(--cyan)}
 
   /* Turnuva tablosu */
   .bracketPanel{min-width:0}
+  .bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 12px}
+  .barmsg{flex:1 1 220px;font-size:17px;color:var(--yellow)}
+  .legend{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin:0 0 8px;font-size:15px;color:var(--chalk-dim)}
+  .scrollhint{display:none;margin:0 0 6px;font-size:15px;color:var(--chalk-dim)}
   .bracket{display:flex;gap:44px;overflow-x:auto;padding:6px 6px 14px;min-height:240px}
-  .col{display:flex;flex-direction:column;min-width:238px;flex:0 0 auto}
-  .colhead{font-family:var(--font-sc);font-size:24px;letter-spacing:.06em;text-align:center}
+  .col{--rc:var(--chalk);display:flex;flex-direction:column;min-width:244px;flex:0 0 auto}
+  .rc0{--rc:var(--cyan)} .rc1{--rc:var(--green)} .rc2{--rc:var(--yellow)} .rc3{--rc:var(--orange)} .rc4{--rc:var(--pink)} .rc5{--rc:var(--purple)}
+  .colhead{font-size:25px;letter-spacing:.04em;text-align:center;color:var(--rc)}
   .colsub{font-size:14px;color:var(--chalk-dim);text-align:center;margin-bottom:12px}
   .colbody{flex:1;display:flex;flex-direction:column;justify-content:space-around;gap:22px}
-  .match{width:220px;margin-right:18px}
+  .match{width:226px;margin-right:18px}
   .mcap{font-size:14px;color:var(--chalk-dim);height:20px;display:flex;align-items:center;gap:6px;white-space:nowrap}
-  .mbody{position:relative;height:80px}
-  .mbody::before{content:"";position:absolute;right:0;top:40px;height:40px;width:2px;background:var(--chalk);filter:url(#roughV);opacity:.85}
-  .mbody::after{content:"";position:absolute;right:-18px;top:59px;width:18px;height:2px;background:var(--chalk);filter:url(#rough);opacity:.85}
-  .slot{position:relative;height:40px;display:flex;align-items:flex-end;justify-content:space-between;gap:8px;padding:0 6px 5px}
-  .slot::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--chalk);filter:url(#rough);opacity:.85}
+  .match.playing .mcap{color:var(--chalk)}
+  .mbody{position:relative;height:84px}
+  .mbody::before{content:"";position:absolute;right:0;top:42px;height:42px;width:2px;background:var(--rc);filter:url(#roughV)}
+  .mbody::after{content:"";position:absolute;right:-18px;top:62px;width:18px;height:2px;background:var(--rc);filter:url(#rough)}
+  .slot{position:relative;height:42px;display:flex;align-items:flex-end;justify-content:space-between;gap:8px;padding:0 6px 6px}
+  .slot::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--rc);filter:url(#rough)}
   .slot .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:20px;min-width:0}
-  .slot.win .nm{color:var(--gold)}
+  .slot.win .nm{color:var(--yellow)}
   .slot.lose{opacity:.45}
   .slot.lose .nm,.slot.gone .nm{text-decoration:line-through}
   .slot.gone{opacity:.5}
   .slot.empty .nm{color:var(--chalk-dim)}
+  .slot.sw{cursor:pointer;outline:2px dashed var(--pink);outline-offset:1px;border-radius:8px}
+  .slot.sw:hover{background:rgba(255,126,182,.2)}
+  .slot.sel{background:rgba(255,216,77,.28);outline:2px solid var(--yellow)}
   .match.ghost{opacity:.4}
-  .match.playing .mbody{filter:drop-shadow(0 0 5px rgba(255,224,122,.35))}
+  .match.playing .mbody{filter:drop-shadow(0 0 6px color-mix(in srgb,var(--rc) 55%,transparent))}
   .dot{width:10px;height:10px;border-radius:50%;display:inline-block;background:var(--chalk)}
-  .dot.kirmizi{background:var(--red)} .dot.mavi{background:var(--blue)} .dot.beyaz{background:var(--white)}
+  .dot.kirmizi{background:var(--t-red)} .dot.mavi{background:var(--t-blue)} .dot.beyaz{background:var(--t-white)}
+  .champ{--rc:var(--yellow)}
   .champ .colbody{align-items:center;justify-content:center;text-align:center;gap:8px}
-  .trophy{color:var(--gold)} .trophy.ghost{color:var(--chalk-dim);opacity:.5}
+  .trophy{color:var(--yellow);filter:drop-shadow(0 0 10px rgba(255,216,77,.55))} .trophy.ghost{color:var(--chalk-dim);opacity:.5;filter:none}
   .trophy svg{width:78px;height:78px}
-  .champname{font-size:28px;color:var(--gold);overflow-wrap:anywhere;max-width:230px}
-  .scrollhint{display:none;margin:-4px 0 6px;font-size:15px;color:var(--chalk-dim)}
+  .champname{font-size:30px;color:var(--yellow);overflow-wrap:anywhere;max-width:230px}
   .empty.big{margin:30px 10px;color:var(--chalk-dim);font-size:22px;text-align:center}
 
   /* Onay penceresi */
-  .modal{position:fixed;inset:0;background:rgba(0,0,0,.62);display:grid;place-items:center;padding:16px;z-index:50}
-  .dlg{background:#2e403f;border:3px solid var(--chalk);border-radius:14px;padding:22px;max-width:440px;width:100%;box-shadow:0 20px 60px #000a}
-  .dlg h3{margin:0 0 8px;font-family:var(--font-sc);font-weight:400;font-size:28px;letter-spacing:.04em}
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:grid;place-items:center;padding:16px;z-index:50}
+  .dlg{background:#244640;border:3px solid var(--pink);border-radius:14px;padding:22px;max-width:450px;width:100%;box-shadow:0 20px 60px #000a}
+  .dlg h3{margin:0 0 8px;font-weight:400;font-size:29px;letter-spacing:.03em;color:var(--yellow)}
   .dlg p{margin:0 0 18px;overflow-wrap:anywhere}
   .actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
-  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#202a2a;border:2px solid var(--chalk);border-radius:12px;padding:10px 16px;z-index:60;max-width:92vw}
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#1e2a29;border:2px solid var(--cyan);border-radius:12px;padding:10px 16px;z-index:60;max-width:92vw}
   .toast.err{border-color:var(--danger);color:var(--danger)}
 
   /* Sadece izleme modu (?view=1) */
-  .view .admin,.view #teamForm,.view #controls,.view #formNote{display:none!important}
+  .view .admin,.view #teamForm,.view #controls,.view #formNote,.view #bracketBar{display:none!important}
   .view .layout{grid-template-columns:minmax(0,1fr)}
   .view .side{pointer-events:none}
 
@@ -172,18 +198,18 @@
 <div class="frame"><div class="board">
 
   <header class="top">
-    <h1>BEER PONG ŞAMPİYONASI</h1>
+    <h1 id="mainTitle"><span class="em">🍻</span> <span class="grad">Beer Pong Turnuvası</span> <span class="em">🍻</span></h1>
     <div id="conn" class="conn"></div>
   </header>
 
-  <section id="tablesSection" class="panel" hidden>
+  <section id="tablesSection" class="panel p-tables" hidden>
     <h2>Masalar</h2>
     <div id="tablesBox" class="tables"></div>
     <div id="queueBox" class="queue"></div>
   </section>
 
   <div class="layout">
-    <aside class="panel">
+    <aside class="panel p-teams">
       <h2>Takımlar <small id="teamCount"></small></h2>
       <form id="teamForm" class="form" autocomplete="off">
         <label>Takım adı
@@ -200,8 +226,13 @@
       <div id="controls"></div>
     </aside>
 
-    <section class="panel bracketPanel">
+    <section class="panel p-board bracketPanel">
       <h2>Turnuva tablosu</h2>
+      <div id="bracketBar" class="bar" hidden></div>
+      <div class="legend">Takımın yanındaki renkli sayı = <b>zorluk seviyesi</b>:
+        <span class="lvl sm" style="--lv:1">1</span> kolay
+        <span class="lvl sm" style="--lv:5">5</span>
+        <span class="lvl sm" style="--lv:10">10</span> zor</div>
       <p class="scrollhint">Diğer turlar için tabloyu yana kaydır →</p>
       <div id="board" class="bracket"></div>
     </section>
@@ -240,8 +271,9 @@ const $ = (s, r=document) => r.querySelector(s);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid = () => (window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID()
   : 'id-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
-const clone = o => JSON.parse(JSON.stringify(o));
 const blankState = () => ({teams:[], matches:[], t:{status:'setup', current_round:0, pair_mode:'close', champion:null}});
+// Zorluk rozeti (her takımın yanında)
+const lv = (d, full) => `<span class="lvl ${full ? 'full' : 'sm'}" style="--lv:${d}" title="Zorluk seviyesi: ${d}">${full ? 'Zorluk ' + d : d}</span>`;
 
 /* ================= Saf mantık (eşleştirme) ================= */
 function shuffle(a){
@@ -253,25 +285,46 @@ function shuffle(a){
   return r;
 }
 
-// pool: bu tura giren (silinmemiş) takımlar. Tek sayıysa rastgele biri "bay" geçer.
-function buildRound(pool, round, mode){
-  const list = shuffle(pool);                       // önce karıştır: bay seçimi + eşit seviyelerde rastgelelik
-  const bye = list.length % 2 === 1 ? list.pop() : null;
-  let ordered = list;
+// list içinden çiftler üretir. Tek sayıda takım varsa biri dışarıda kalır.
+// 1-2. tur: zorluğa göre (close: komşu seviyeler, balanced: güçlü-zayıf). 3. tur ve sonrası: rastgele.
+function makePairs(list, round, mode){
+  let l = shuffle(list);
   if (round <= DIFF_ROUNDS) {
-    list.sort((a, b) => a.difficulty - b.difficulty);   // kararlı sıralama
-    if (mode === 'balanced') {
-      ordered = [];
-      for (let i = 0; i < list.length / 2; i++) ordered.push(list[i], list[list.length - 1 - i]);
+    l.sort((a, b) => a.difficulty - b.difficulty);            // kararlı sıralama; eşit seviyelerde rastgele
+    if (l.length % 2 === 1) {
+      let k = Math.floor(l.length / 2);
+      if (mode !== 'balanced') {                              // toplam seviye farkını en az bırakan takımı dışarıda bırak
+        let bestCost = Infinity;
+        for (let x = 0; x < l.length; x++) {
+          const rest = l.filter((_, i) => i !== x); let c = 0;
+          for (let i = 0; i + 1 < rest.length; i += 2) c += Math.abs(rest[i].difficulty - rest[i + 1].difficulty);
+          if (c < bestCost) { bestCost = c; k = x; }
+        }
+      }
+      l.splice(k, 1);
     }
+    if (mode === 'balanced') {
+      const o = [];
+      for (let i = 0; i < l.length / 2; i++) o.push(l[i], l[l.length - 1 - i]);
+      l = o;
+    }
+  } else if (l.length % 2 === 1) {
+    l.pop();
   }
-  const rows = [];
-  for (let i = 0; i < ordered.length; i += 2) {
-    rows.push({round, slot: i / 2, team_a: ordered[i].id, team_b: ordered[i + 1].id,
-      winner: null, status: 'waiting', table_name: null, is_bye: false, walkover: false});
-  }
-  if (bye) rows.push({round, slot: rows.length, team_a: bye.id, team_b: null,
-    winner: bye.id, status: 'done', table_name: null, is_bye: true, walkover: false});
+  const pairs = [];
+  for (let i = 0; i + 1 < l.length; i += 2) pairs.push([l[i], l[i + 1]]);
+  return pairs;
+}
+
+const newRow = (round, slot, a, b) => ({round, slot, team_a:a, team_b:b, winner:null, status:'waiting', table_name:null, is_bye:false, walkover:false});
+const byeRow = (round, slot, id) => ({round, slot, team_a:id, team_b:null, winner:id, status:'done', table_name:null, is_bye:true, walkover:false});
+
+// 1. tur: bütün eşleşmeler birden kurulur. Tek sayıysa rastgele bir takım bay geçer.
+function buildRound(pool, round, mode){
+  const list = shuffle(pool);
+  const bye = list.length % 2 === 1 ? list.pop() : null;
+  const rows = makePairs(list, round, mode).map(([a, b], i) => newRow(round, i, a.id, b.id));
+  if (bye) rows.push(byeRow(round, rows.length, bye.id));
   return rows;
 }
 function countRounds(n){ let r = 0; while (n > 1) { n = Math.ceil(n / 2); r++; } return r; }
@@ -306,11 +359,12 @@ function createLocalDb(){
       d.matches.push(...rows); write(d); return rows;
     },
     async updateMatch(id, p){ const d = read(); Object.assign(d.matches.find(m => m.id === id) || {}, p); write(d); },
+    async clearMatches(){ const d = read(); d.matches = []; write(d); },
     async updateTournament(p){ const d = read(); Object.assign(d.t, p); write(d); },
-    async reset(){
+    async reset(){                                   // her şeyi sil: takımlar + maçlar + sonuçlar
       const d = read();
       d.t = Object.assign(d.t, {status:'setup', current_round:0, champion:null});
-      d.matches = []; d.teams = d.teams.filter(t => !t.is_deleted); write(d);
+      d.matches = []; d.teams = []; write(d);
     },
     subscribe(cb){ window.addEventListener('storage', e => { if (e.key === KEY) cb(); }); }
   };
@@ -336,11 +390,12 @@ function createSupabaseDb(url, key){
     async updateTeam(id, p){ chk(await sb.from('teams').update(p).eq('id', id)); },
     async insertMatches(list){ return chk(await sb.from('matches').insert(list).select()); },
     async updateMatch(id, p){ chk(await sb.from('matches').update(p).eq('id', id)); },
+    async clearMatches(){ chk(await sb.from('matches').delete().not('id', 'is', null)); },
     async updateTournament(p){ chk(await sb.from('tournament').update(Object.assign({updated_at:new Date().toISOString()}, p)).eq('id', 1)); },
     async reset(){
       chk(await sb.from('tournament').update({status:'setup', current_round:0, champion:null}).eq('id', 1));
       chk(await sb.from('matches').delete().not('id', 'is', null));
-      chk(await sb.from('teams').delete().eq('is_deleted', true));
+      chk(await sb.from('teams').delete().not('id', 'is', null));
     },
     subscribe(cb){ sb.channel('bp-live').on('postgres_changes', {event:'*', schema:'public'}, cb).subscribe(); }
   };
@@ -348,9 +403,11 @@ function createSupabaseDb(url, key){
 
 /* ================= Durum ================= */
 let db, S = blankState(), busy = 0, dirty = false, reloadTimer = null;
+let editMode = false, sel = null;          // takım yer değiştirme (yalnızca bu cihazda)
 const T = id => S.teams.find(x => x.id === id) || null;
 const aliveTeams = () => S.teams.filter(t => !t.is_deleted);
 const tableLabel = k => (TABLES.find(t => t.key === k) || {}).label || '';
+const isDraft = () => S.t.status === 'setup' && S.matches.length > 0;   // önizleme: eşleşmeler hazır, turnuva başlamadı
 
 async function patchMatch(id, p){ await db.updateMatch(id, p); const m = S.matches.find(x => x.id === id); if (m) Object.assign(m, p); }
 async function patchTeam(id, p){ await db.updateTeam(id, p); const t = T(id); if (t) Object.assign(t, p); }
@@ -377,68 +434,122 @@ function scheduleReload(){
 }
 
 /* ================= Turnuva akışı ================= */
+// Tur bekleme yok: bir masa boşalınca, sırada maç yoksa kazanıp bekleyen takımlar hemen eşleştirilip o masaya atanır.
+const rm = r => S.matches.filter(m => m.round === r);
+const maxRound = () => S.matches.reduce((a, m) => Math.max(a, m.round), 0);
+const idsIn = ms => { const s = new Set(); ms.forEach(m => { if (m.team_a) s.add(m.team_a); if (m.team_b) s.add(m.team_b); }); return s; };
+const busyTables = () => S.matches.filter(m => m.status === 'playing' || (m.status === 'waiting' && !m.is_bye)).length;
+
+// r. tura giren takımların durumu: placed (maça yerleşmiş), pool (kazanıp rakip bekleyen), F (henüz kazananı belli olmayanlar)
+function roundInfo(r){
+  if (r <= 1) { const placed = idsIn(rm(1)); return {placed, pool:[], F:0, T:placed.size}; }
+  const p = roundInfo(r - 1);
+  const done = rm(r - 1).filter(m => m.status === 'done');
+  const F = Math.max(0, Math.ceil(p.T / 2) - done.length);
+  const placed = idsIn(rm(r));
+  const pool = done.filter(m => m.winner).map(m => T(m.winner)).filter(t => t && !t.is_deleted && !placed.has(t.id));
+  return {placed, pool, F, T: placed.size + pool.length + F};
+}
+
+async function scheduleRound(r){
+  const {pool, F, placed} = roundInfo(r);
+  if (!pool.length) return false;
+  const cur = rm(r);
+  const hasBye = cur.some(m => m.is_bye);
+  const working = shuffle(pool);
+  const needBye = (placed.size + working.length + F) % 2 === 1 && !hasBye;
+  const free = Math.max(0, TABLES.length - busyTables());
+  let bye = null;
+
+  if (F === 0) {                                  // herkes geldi
+    if (working.length % 2 === 1) {
+      if (placed.size === 0 && working.length === 1) return false;     // tek takım kaldı: şampiyon
+      bye = working.splice(Math.floor(Math.random() * working.length), 1)[0];
+    }
+  } else if (needBye && cur.length === 0 && working.length >= 2 && free > 0) {
+    // tur tek sayıda takımla oynanacak: bay'ı baştan, henüz gelmeyenler dahil herkes arasında eşit şansla seç
+    const idx = Math.floor(Math.random() * (working.length + F));
+    if (idx < working.length) bye = working.splice(idx, 1)[0];
+  }
+
+  let slot = cur.reduce((a, m) => Math.max(a, m.slot), -1) + 1;
+  const rows = makePairs(working, r, S.t.pair_mode).slice(0, free).map(([a, b]) => newRow(r, slot++, a.id, b.id));
+  if (bye) rows.push(byeRow(r, slot++, bye.id));
+  if (!rows.length) return false;
+  S.matches.push(...await db.insertMatches(rows));
+  return true;
+}
+
+async function assignTables(){
+  const used = new Set(S.matches.filter(m => m.status === 'playing').map(m => m.table_name));
+  const free = TABLES.map(t => t.key).filter(k => !used.has(k));
+  const waiting = S.matches.filter(m => m.status === 'waiting' && !m.is_bye).sort((a, b) => a.round - b.round || a.slot - b.slot);
+  const n = Math.min(free.length, waiting.length);
+  for (let i = 0; i < n; i++) await patchMatch(waiting[i].id, {status:'playing', table_name:free[i]});
+  return n > 0;
+}
+
 async function progress(){
   if (S.t.status !== 'running') return;
-  for (let guard = 0; guard < 25; guard++) {
-    const cur = () => S.matches.filter(m => m.round === S.t.current_round);
-
+  for (let guard = 0; guard < 80; guard++) {
+    let changed = false;
     // 1) Silinen takımın maçı: rakip hükmen kazanır
-    for (const m of cur()) {
-      if (m.status === 'done') continue;
+    for (const m of S.matches.slice()) {
+      if (m.status === 'done' || m.is_bye) continue;
       const a = T(m.team_a), b = T(m.team_b);
       if ((a && a.is_deleted) || (b && b.is_deleted)) {
         const w = (a && !a.is_deleted) ? a.id : ((b && !b.is_deleted) ? b.id : null);
         await patchMatch(m.id, {status:'done', winner:w, walkover:true, table_name:null});
+        changed = true;
       }
     }
-
-    // 2) Tur bitti mi? → şampiyon ya da sonraki tur
-    const matches = cur();
-    if (matches.length && matches.every(m => m.status === 'done')) {
-      const pool = matches.map(m => m.winner).filter(Boolean).map(T).filter(t => t && !t.is_deleted);
-      if (pool.length <= 1) {
-        await patchT({status:'finished', champion: pool[0] ? pool[0].id : null});
-        return;
-      }
-      const next = S.t.current_round + 1;
-      if (S.matches.some(m => m.round === next)) break;     // başka cihaz zaten oluşturmuş
-      const rows = await db.insertMatches(buildRound(pool, next, S.t.pair_mode));
-      S.matches.push(...rows);
-      await patchT({current_round: next});
-      continue;
-    }
-    break;
+    // 2) Boş masalara sıradaki maçlar
+    if (await assignTables()) changed = true;
+    // 3) Boş masa kaldıysa, kazanıp bekleyenlerden yeni maçlar kur
+    for (let r = 2; r <= maxRound() + 1; r++) if (await scheduleRound(r)) changed = true;
+    if (!changed) break;
   }
-  await assignTables();
-}
-
-// Boş masalara, sıradaki maçları sırayla yerleştirir
-async function assignTables(){
-  const cur = S.matches.filter(m => m.round === S.t.current_round);
-  const used = new Set(cur.filter(m => m.status === 'playing').map(m => m.table_name));
-  const free = TABLES.map(t => t.key).filter(k => !used.has(k));
-  const waiting = cur.filter(m => m.status === 'waiting').sort((a, b) => a.slot - b.slot);
-  for (let i = 0; i < Math.min(free.length, waiting.length); i++) {
-    await patchMatch(waiting[i].id, {status:'playing', table_name:free[i]});
+  // 4) Şampiyon belli mi?
+  if (S.matches.length && S.matches.every(m => m.status === 'done')) {
+    const waiting = [];
+    for (let r = 2; r <= maxRound() + 1; r++) waiting.push(...roundInfo(r).pool);
+    if (waiting.length <= 1) await patchT({status:'finished', champion: waiting[0] ? waiting[0].id : null});
   }
 }
 
 /* ================= Eylemler ================= */
-async function onStart(){
+async function createDraft(){
   const pool = aliveTeams();
-  if (pool.length < 2) return;
+  if (pool.length < 2) throw new Error('En az 2 takım gerekli.');
+  S.matches.push(...await db.insertMatches(buildRound(pool, 1, S.t.pair_mode)));
+}
+async function startTournament(){
+  if (!S.matches.length) await createDraft();
+  await patchT({status:'running', current_round:1});
+  editMode = false; sel = null;
+  await progress();
+}
+
+async function onStart(){
+  const n = aliveTeams().length;
+  if (n < 2) return;
   const ok = await confirmDlg({
     title: 'Turnuva başlasın mı?',
-    text: `${pool.length} takım, ${countRounds(pool.length)} tur. Başladıktan sonra yeni takım eklenemez.`,
+    text: `${n} takım, ${countRounds(n)} tur. Başladıktan sonra yeni takım eklenemez.`,
     okText: 'Başlat'
   });
-  if (!ok) return;
-  await act(async () => {
-    const rows = await db.insertMatches(buildRound(pool, 1, S.t.pair_mode));
-    S.matches.push(...rows);
-    await patchT({status:'running', current_round:1});
-    await progress();
+  if (ok) await act(startTournament);
+}
+async function onPreview(){ await act(async () => { await createDraft(); editMode = true; sel = null; }); }
+async function onReshuffle(){ await act(async () => { await db.clearMatches(); S.matches = []; sel = null; await createDraft(); }); }
+async function onCancelDraft(){ await act(async () => { await db.clearMatches(); S.matches = []; sel = null; editMode = false; }); }
+async function onBegin(){
+  const ok = await confirmDlg({
+    title: 'Turnuva başlasın mı?',
+    text: 'Eşleşmeler olduğu gibi kaydedilir ve ilk üç maç masalara atanır.',
+    okText: 'Başlat'
   });
+  if (ok) await act(startTournament);
 }
 
 async function onWinner(mid, tid){
@@ -446,7 +557,7 @@ async function onWinner(mid, tid){
   if (!m || !t || m.status !== 'playing') return;
   const ok = await confirmDlg({
     title: 'Kazananı onayla',
-    text: `“${t.name}” kazandı olarak kaydedilsin mi?`,
+    text: `“${t.name}” (zorluk ${t.difficulty}) kazandı olarak kaydedilsin mi?`,
     okText: 'Evet, kazandı'
   });
   if (!ok) return;
@@ -460,16 +571,23 @@ async function onWinner(mid, tid){
 
 async function onDelete(id){
   const t = T(id); if (!t) return;
-  const running = S.t.status === 'running';
+  const st = S.t.status;
+  let extra = '';
+  if (st === 'running') {
+    const live = S.matches.find(x => (x.status === 'playing' || x.status === 'waiting') && (x.team_a === id || x.team_b === id));
+    if (live) extra = (live.status === 'playing' ? ` Şu anda bir masada oynuyor (${tableLabel(live.table_name)}).` : '') +
+      ' Takım turnuvadan tamamen elenir ve rakibi otomatik kazanmış sayılır.';
+    else extra = ' Takım turnuvadan çıkarılır.';
+  } else if (isDraft()) extra = ' Eşleşme önizlemesi silinir, yeniden oluşturman gerekir.';
   const ok = await confirmDlg({
     title: 'Takımı sil',
-    text: `“${t.name}” takımını silmek istediğine emin misin?` +
-      (running ? ' Turnuva devam ediyor: bu takım turnuvadan çıkarılır ve henüz oynamadığı maçta rakibi hükmen kazanır.' : ''),
+    text: `“${t.name}” takımını silmek istediğine emin misin?${extra}`,
     okText: 'Evet, sil', danger: true
   });
   if (!ok) return;
   await act(async () => {
-    if (S.t.status === 'setup') {
+    if (st === 'setup') {
+      if (S.matches.length) { await db.clearMatches(); S.matches = []; sel = null; editMode = false; }
       await db.deleteTeam(id);
       S.teams = S.teams.filter(x => x.id !== id);
     } else {
@@ -481,12 +599,43 @@ async function onDelete(id){
 
 async function onReset(){
   const ok = await confirmDlg({
-    title: 'Turnuvayı sıfırla',
-    text: 'Tüm maçlar ve sonuçlar silinir. Silinmemiş takımlar listede kalır ve yeniden başlatabilirsin.',
-    okText: 'Evet, sıfırla', danger: true
+    title: 'Her şeyi sıfırla',
+    text: 'Tüm takımlar, eşleşmeler ve sonuçlar silinir. Bu işlem geri alınamaz.',
+    okText: 'Evet, hepsini sil', danger: true
   });
   if (!ok) return;
-  await act(async () => { await db.reset(); S = await db.load(); });
+  await act(async () => { await db.reset(); S = await db.load(); editMode = false; sel = null; });
+}
+
+/* --- Takım yer değiştirme --- */
+function swappable(m){
+  if (S.t.status === 'finished') return false;
+  if (m.status === 'waiting' && !m.is_bye) return true;
+  if (m.is_bye && m.team_a) {   // bay geçen takım henüz sonraki turda bir maça yerleşmediyse
+    return !rm(m.round + 1).some(x => x.team_a === m.team_a || x.team_b === m.team_a);
+  }
+  return false;
+}
+function canSwap(){
+  const per = {};
+  S.matches.forEach(m => { if (swappable(m)) per[m.round] = (per[m.round] || 0) + 1; });
+  return Object.values(per).some(c => c >= 2);
+}
+const editing = () => !VIEW && (isDraft() || (S.t.status === 'running' && editMode && canSwap()));
+
+function onSwapPick(mid, tid){
+  if (!sel) { sel = {mid, tid}; render(); return; }
+  if (sel.mid === mid) { sel = (sel.tid === tid) ? null : {mid, tid}; render(); return; }
+  const a = sel; sel = null;
+  act(() => swapTeams(a.mid, a.tid, mid, tid));
+}
+async function swapTeams(m1id, t1, m2id, t2){
+  const m1 = S.matches.find(x => x.id === m1id), m2 = S.matches.find(x => x.id === m2id);
+  if (!m1 || !m2 || m1.round !== m2.round || !swappable(m1) || !swappable(m2)) throw new Error('Bu iki takım şu an yer değiştiremez.');
+  const repl = (m, from, to) => { const p = {}; if (m.team_a === from) p.team_a = to; else p.team_b = to; if (m.is_bye) p.winner = to; return p; };
+  await patchMatch(m1.id, repl(m1, t1, t2));
+  await patchMatch(m2.id, repl(m2, t2, t1));
+  if (S.t.status === 'running') await progress();
 }
 
 /* ================= Arayüz ================= */
@@ -496,11 +645,11 @@ const ICON_CUP = '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" str
 function teamState(t){
   if (S.t.status === 'setup') return null;
   if (S.t.champion === t.id) return {k:'champ', txt:'ŞAMPİYON'};
-  const m = S.matches.filter(x => x.round === S.t.current_round).find(x => x.team_a === t.id || x.team_b === t.id);
+  const m = S.matches.filter(x => x.team_a === t.id || x.team_b === t.id).sort((a, b) => b.round - a.round)[0];
   if (!m) return {k:'out', txt:'Elendi'};
   if (m.status === 'playing') return {k:'play', txt:'Oynuyor · ' + tableLabel(m.table_name)};
   if (m.status === 'waiting') return {k:'wait', txt:'Sırada'};
-  if (m.winner === t.id) return {k:'adv', txt: m.is_bye ? 'Bay · üst tura' : 'Üst tura'};
+  if (m.winner === t.id) return S.t.status === 'finished' ? {k:'out', txt:'Elendi'} : {k:'adv', txt: m.is_bye ? 'Bay · rakip bekliyor' : 'Rakip bekliyor'};
   return {k:'out', txt:'Elendi'};
 }
 
@@ -520,7 +669,7 @@ function renderTeams(){
     const st = teamState(t);
     return `<li class="${st && st.k === 'out' ? 'out' : ''}">
       <span class="tn">${esc(t.name)}${st ? `<span class="chip ${st.k}">${esc(st.txt)}</span>` : ''}</span>
-      <span class="lvl" title="Zorluk seviyesi">${t.difficulty}</span>
+      ${lv(t.difficulty, true)}
       ${finished ? '<span></span>' : `<button type="button" class="trash admin" data-del="${t.id}" aria-label="${esc(t.name)} takımını sil" title="Sil">${ICON_TRASH}</button>`}
     </li>`;
   }).join('') : '<li class="empty">Henüz takım yok. Yukarıdan ekle.</li>';
@@ -533,26 +682,48 @@ function renderControls(){
       <label>Eşleştirme (1. ve 2. tur)
         <select id="modeSel">${Object.keys(MODE_LABEL).map(k => `<option value="${k}" ${S.t.pair_mode === k ? 'selected' : ''}>${MODE_LABEL[k]}</option>`).join('')}</select>
       </label>
+      <button type="button" id="previewBtn" class="btn alt" ${n < 2 ? 'disabled' : ''}>Eşleşmeleri önizle / düzenle</button>
       <button type="button" id="startBtn" class="btn primary" ${n < 2 ? 'disabled' : ''}>Turnuvayı başlat</button>
       <p class="hint">${n < 2 ? 'Başlamak için en az 2 takım gerekli.' : `${n} takım · ${countRounds(n)} tur · aynı anda en fazla 3 maç`}</p>`;
+  } else if (isDraft()) {
+    $('#controls').innerHTML = `
+      <p class="hint">Eşleşmeler sağdaki tabloda hazır. Düzenleyip “Turnuvayı başlat”a bas.</p>
+      <button type="button" id="resetBtn" class="btn danger">Her şeyi sıfırla</button>`;
   } else {
     $('#controls').innerHTML = `
       <p class="hint">Eşleştirme: ${esc(MODE_LABEL[S.t.pair_mode] || '')} (1-2. tur), sonrası rastgele.</p>
-      <button type="button" id="resetBtn" class="btn danger">Turnuvayı sıfırla</button>`;
+      <button type="button" id="resetBtn" class="btn danger">Her şeyi sıfırla</button>`;
   }
+}
+
+function renderBar(){
+  const bar = $('#bracketBar');
+  let html = '';
+  if (isDraft()) {
+    const s = sel && T(sel.tid);
+    html = `<span class="barmsg">${s ? `Seçili: ${esc(s.name)} — yer değiştireceğin takıma dokun.` : 'Eşleşmeler hazır. Yerini değiştirmek istediğin takıma, sonra karşısına geçeceği takıma dokun.'}</span>
+      <button type="button" id="reshuffleBtn" class="btn alt">Yeniden karıştır</button>
+      <button type="button" id="cancelDraftBtn" class="btn">Vazgeç</button>
+      <button type="button" id="beginBtn" class="btn primary">Turnuvayı başlat</button>`;
+  } else if (S.t.status === 'running' && canSwap()) {
+    const s = sel && T(sel.tid);
+    html = `<button type="button" id="editBtn" class="btn ${editMode ? 'primary' : 'pink'}">${editMode ? 'Düzenlemeyi bitir' : 'Takımları yer değiştir'}</button>` +
+      (editMode ? `<span class="barmsg">${s ? `Seçili: ${esc(s.name)} — yer değiştireceğin takıma dokun.` : 'Henüz başlamamış maçlardaki takımlardan birine, sonra yer değiştireceği takıma dokun.'}</span>` : '');
+  }
+  bar.innerHTML = html;
+  bar.hidden = !html;
 }
 
 function renderTables(){
   const running = S.t.status === 'running';
   $('#tablesSection').hidden = !running;
   if (!running) return;
-  const cur = S.matches.filter(m => m.round === S.t.current_round);
   $('#tablesBox').innerHTML = TABLES.map(tb => {
-    const m = cur.find(x => x.status === 'playing' && x.table_name === tb.key);
+    const m = S.matches.find(x => x.status === 'playing' && x.table_name === tb.key);
     let body;
     if (m) {
       const a = T(m.team_a), b = T(m.team_b);
-      const side = t => `<button type="button" class="side" data-win="${m.id}:${t.id}"><span class="nm">${esc(t.name)}</span><span class="lvl sm">${t.difficulty}</span></button>`;
+      const side = t => `<button type="button" class="side" data-win="${m.id}:${t.id}"><span class="nm">${esc(t.name)}</span>${lv(t.difficulty, true)}</button>`;
       body = `<div class="tmeta">${m.round}. tur · maç ${m.slot + 1}</div>
         <div class="vs">${side(a)}<div class="vsmark">VS</div>${side(b)}</div>
         <p class="hint">Kazanan takıma dokun</p>`;
@@ -562,18 +733,23 @@ function renderTables(){
     return `<div class="tcard ${tb.key}"><div class="thead"><span class="swatch"></span>${tb.label}</div>${body}</div>`;
   }).join('');
 
-  const waiting = cur.filter(m => m.status === 'waiting').sort((a, b) => a.slot - b.slot);
-  $('#queueBox').innerHTML = waiting.length
-    ? '<strong>Sırada:</strong>' + waiting.map(m => `<span class="qchip">${esc(T(m.team_a).name)} – ${esc(T(m.team_b).name)}</span>`).join('')
-    : '';
+  const waiting = S.matches.filter(m => m.status === 'waiting' && !m.is_bye).sort((a, b) => a.round - b.round || a.slot - b.slot);
+  const pool = [];
+  for (let r = 2; r <= maxRound() + 1; r++) pool.push(...roundInfo(r).pool);
+  const chip = t => `${esc(t.name)} ${lv(t.difficulty)}`;
+  $('#queueBox').innerHTML =
+    (waiting.length ? '<strong class="lab">Sırada:</strong>' + waiting.map(m => `<span class="qchip">${chip(T(m.team_a))} <span>–</span> ${chip(T(m.team_b))}</span>`).join('') : '') +
+    (pool.length ? '<strong class="lab">Rakip bekleyen:</strong>' + pool.map(t => `<span class="qchip wait">${chip(t)}</span>`).join('') : '');
 }
 
 function slotHTML(t, m){
   if (!t) return '<div class="slot empty"><span class="nm">—</span></div>';
   const win = m.status === 'done' && m.winner === t.id;
   const lose = m.status === 'done' && !m.is_bye && m.winner && m.winner !== t.id;
-  return `<div class="slot ${win ? 'win' : ''} ${lose ? 'lose' : ''} ${t.is_deleted ? 'gone' : ''}">
-    <span class="nm" title="${esc(t.name)}">${esc(t.name)}</span><span class="lvl sm">${t.difficulty}</span></div>`;
+  const can = editing() && swappable(m);
+  const isSel = sel && sel.mid === m.id && sel.tid === t.id;
+  return `<div class="slot ${win ? 'win' : ''} ${lose ? 'lose' : ''} ${t.is_deleted ? 'gone' : ''} ${can ? 'sw' : ''} ${isSel ? 'sel' : ''}" ${can ? `data-sw="${m.id}:${t.id}"` : ''}>
+    <span class="nm" title="${esc(t.name)}">${esc(t.name)}</span>${lv(t.difficulty)}</div>`;
 }
 
 function matchHTML(m){
@@ -605,10 +781,14 @@ function renderBoard(){
   }
 
   const cols = [];
+  rounds.forEach(r => cols.push({round:r, matches:byRound.get(r).slice().sort((a, b) => (a.is_bye - b.is_bye) || (a.slot - b.slot)), missing:0}));
   let next, rno;
-  rounds.forEach(r => cols.push({round:r, matches:byRound.get(r).slice().sort((a, b) => a.slot - b.slot)}));
-  if (rounds.length) { next = cols[cols.length - 1].matches.length; rno = rounds[rounds.length - 1] + 1; }
-  else { next = alive.length; rno = 1; }
+  if (rounds.length) {
+    const last = cols[cols.length - 1];
+    const expected = Math.ceil(roundInfo(last.round).T / 2);
+    last.missing = Math.max(0, expected - last.matches.length);     // henüz kurulmamış eşleşmeler
+    next = expected; rno = last.round + 1;
+  } else { next = alive.length; rno = 1; }
   while (next > 1) {                       // henüz oynanmamış turlar: boş tebeşir çizgileri
     const c = Math.ceil(next / 2);
     cols.push({round:rno, ghost:{count:c, bye:next % 2 === 1}});
@@ -617,26 +797,37 @@ function renderBoard(){
   const total = cols.length;
 
   let html = cols.map((c, i) => {
-    const inner = c.matches
-      ? c.matches.map(matchHTML).join('')
-      : Array.from({length:c.ghost.count}, (_, k) => ghostHTML(c.ghost.bye && k === c.ghost.count - 1)).join('');
-    return `<div class="col"><div class="colhead">${roundName(i + 1, total)}</div>
+    let inner;
+    if (c.matches) {
+      const real = c.matches.filter(m => !m.is_bye).map(matchHTML).join('');
+      const ghosts = Array.from({length:c.missing}, () => ghostHTML(false)).join('');
+      const byes = c.matches.filter(m => m.is_bye).map(matchHTML).join('');
+      inner = real + ghosts + byes;
+    } else {
+      inner = Array.from({length:c.ghost.count}, (_, k) => ghostHTML(c.ghost.bye && k === c.ghost.count - 1)).join('');
+    }
+    const cls = i === total - 1 ? 'champ' : 'rc' + (i % 6);
+    return `<div class="col ${cls}"><div class="colhead">${roundName(i + 1, total)}</div>
       <div class="colsub">${pairLabel(c.round, S.t.pair_mode)}</div><div class="colbody">${inner}</div></div>`;
   }).join('');
 
   const champ = S.t.status === 'finished' && S.t.champion ? T(S.t.champion) : null;
   html += `<div class="col champ"><div class="colhead">ŞAMPİYON</div><div class="colsub">&nbsp;</div>
     <div class="colbody">${champ
-      ? `<div class="trophy">${ICON_CUP}</div><div class="champname">${esc(champ.name)}</div>`
+      ? `<div class="trophy">${ICON_CUP}</div><div class="champname">${esc(champ.name)}</div>${lv(champ.difficulty, true)}`
       : `<div class="trophy ghost">${ICON_CUP}</div>`}</div></div>`;
   box.innerHTML = html;
 }
 
 function render(){
-  renderConn(); renderTeams(); renderControls(); renderTables(); renderBoard();
+  if (sel) { const m = S.matches.find(x => x.id === sel.mid); if (!m || !swappable(m)) sel = null; }
+  if (S.t.status !== 'running' && !isDraft()) { editMode = false; sel = null; }
+  renderConn(); renderTeams(); renderControls(); renderBar(); renderTables(); renderBoard();
   const locked = S.t.status !== 'setup' || S.matches.length > 0;
   $('#teamForm').querySelectorAll('input,button').forEach(el => { el.disabled = locked; });
-  $('#formNote').textContent = locked ? 'Turnuva başladığı için yeni takım eklenemez.' : '';
+  $('#formNote').textContent = isDraft()
+    ? 'Eşleşmeler hazır. Takım eklemek için önce “Vazgeç”e bas.'
+    : (locked ? 'Turnuva başladığı için yeni takım eklenemez.' : '');
 }
 
 /* ================= Onay penceresi + bildirim ================= */
@@ -690,12 +881,20 @@ function bind(){
 
   document.addEventListener('click', e => {
     if (VIEW) return;
-    const del = e.target.closest('[data-del]');
-    if (del) { onDelete(del.dataset.del); return; }
-    const win = e.target.closest('[data-win]');
-    if (win) { const [mid, tid] = win.dataset.win.split(':'); onWinner(mid, tid); return; }
-    if (e.target.closest('#startBtn')) onStart();
-    else if (e.target.closest('#resetBtn')) onReset();
+    const t = e.target;
+    const del = t.closest('[data-del]'); if (del) { onDelete(del.dataset.del); return; }
+    const win = t.closest('[data-win]'); if (win) { const [mid, tid] = win.dataset.win.split(':'); onWinner(mid, tid); return; }
+    const sw = t.closest('[data-sw]'); if (sw) { const [mid, tid] = sw.dataset.sw.split(':'); onSwapPick(mid, tid); return; }
+    const btn = t.closest('button[id]'); if (!btn) return;
+    switch (btn.id) {
+      case 'startBtn': onStart(); break;
+      case 'previewBtn': onPreview(); break;
+      case 'beginBtn': onBegin(); break;
+      case 'reshuffleBtn': onReshuffle(); break;
+      case 'cancelDraftBtn': onCancelDraft(); break;
+      case 'resetBtn': onReset(); break;
+      case 'editBtn': editMode = !editMode; sel = null; render(); break;
+    }
   });
 
   document.addEventListener('change', e => {
@@ -722,7 +921,7 @@ async function init(){
   } catch (e) { console.error(e); }
 }
 
-window.__BP = {buildRound, countRounds};   // test için
+window.__BP = {buildRound, makePairs, countRounds};   // test için
 window.addEventListener('DOMContentLoaded', init);
 })();
 </script>
